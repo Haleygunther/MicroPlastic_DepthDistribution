@@ -23,75 +23,46 @@ library(googledrive)
 library(RColorBrewer)
 
 
-#################################### Original style of graph with 3 groups of 2 columns. Includes Jamies work to calculate statistics
 
+##################    Fixing the code that we made for the original graph to work with the second format we want. WORKSSS!!!!!!
 
-data <- data.frame(values = c(93.3014,73.0361,254.322,172.374,346.571,349.427),  # Create example data
-                   Min = rep(c("15", "30","60"),each = 2),
-                   Depth = LETTERS[1:2])#c(1,2))
+# Import data
+actual_values <- read_sheet("https://docs.google.com/spreadsheets/d/1DjqdOtdoefnd76telvB_zbPpygFFc2bwYJvmlB4SugE/edit?usp=sharing", sheet = "Depth_comparison")
 
-data                                              # Print example data
+# Grouping by Depth value
+actual_values$Depth <- factor(actual_values$Depth, levels = c("2", "1"), labels = c("2", "1"))
 
+# Grouping by min_weathered
+actual_values$min_weathered <- factor(actual_values$min_weathered, levels = c("15", "30", "60"), labels = c("15 min", "30 min", "60 min"))
 
-data_base <- reshape(data,                        # Modify data for Base R barplot
-                     idvar = "Depth",
-                     timevar = "Min",
-                     direction = "wide")
-row.names(data_base) <- data_base$subgroup
-data_base <- data_base[ , 2:ncol(data_base)]
-colnames(data_base) <- c("1", "2","3")
-data_base <- as.matrix(data_base)
-data_base                                         # Print modified data
+# Set Color Brewer palette for blue hues
+palette <- brewer.pal(3, "Blues")
 
-ggplot(data,                                      # Grouped barplot using ggplot2
-       aes(x = Min, y = values, fill = Depth)) +
-  geom_bar(
-          stat = "identity",
-          width=0.90,
-          position = "dodge",
-          ) +
-          
-  labs(y = "% Increase in Mobility", x = "UV Weathering Time (min)")+
-  
-  
-  #Annotation
-
- 
-  annotate("text", x=0.6, y=340, label="(E)", fontface=2)+
-  annotate("text", x=0.72, y=120, label= "1cm")+
-  annotate("text", x= 1.26, y=95, label="2cm")+
-  update_geom_defaults("text", list(size = 10))+
-
-  
-  scale_fill_brewer( labels=c('1', '2'))+
-  labs(fill= "Depth (cm)")+
-#  scale_x_discrete(position = "top")+
-#  scale_y_continuous(sec.axis = dup_axis())+ 
-  theme_bw()+
-
- 
+ggplot(actual_values, aes(x = reorder(Depth, desc(Depth)), y = mob_inc_per, fill = min_weathered)) +
+  geom_col(position = position_dodge(width = 1.08), width = 1) +
+  geom_errorbar(aes(ymin = mob_inc_per - Norm_STD, ymax = mob_inc_per + Norm_STD),
+                width = 0.3, position = position_dodge(width = 1.08)) +
+  labs(x = "Column Depth (cm)", y = "% Increase in Mobility", fill = "Time") +
+  scale_fill_manual(values = palette, na.translate = FALSE, labels = c("15 min", "30 min", "60 min")) +
+  expand_limits(x = c(0.5, 2), y = c(0, 600)) +
+  annotate("text", x = 0.5, y = 590, label = "(E)", fontface = 2) +
+  update_geom_defaults("text", list(size = 10)) +
+  theme_bw() +
   theme(
-    element_blank(),
-    axis.text.x=element_text(size = 25),
-    axis.title.x=element_text(size = 30),
-    axis.text.y=element_text(size=25),
-    axis.title.y=element_text(size = 30),
-   # legend.position = c(0.025, 0.68),
-   legend.position = "none",
-    legend.justification = c("left", "bottom"),
-    legend.box.just = "right",
-    legend.margin = margin(6, 6, 6, 6),
-    legend.text = element_text(size=20),
-    legend.title = element_text(size = 25),
-    legend.background=element_rect(fill = alpha("white", 0.1))
-    )
+    text = element_text(size = 25),
+    axis.text.x = element_text(size = 25),
+    axis.title.x = element_text(size = 25),
+    axis.text.y = element_text(size = 25),
+    axis.title.y = element_text(size = 25),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    strip.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    legend.title = element_blank(),
+    legend.position = c(0.175, 0.92),
+    legend.background = element_rect(fill = "white"),
+    panel.grid.minor = element_blank(),
+    aspect.ratio = 0.7
+  )
 
-#Tukey test for all directions
-one.way <- aov(mob_inc_per ~ factor(min_weathered), data = actual_values)
-#tukey.one.way <- TukeyHSD(one.way)
-tk<-TukeyHSD(one.way)
-# this computed Tukey Honest Significant Differences
-tk
-summary(one.way)
-#summary(tukey.one.way)
 
