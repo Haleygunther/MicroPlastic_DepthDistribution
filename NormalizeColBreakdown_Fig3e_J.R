@@ -173,6 +173,38 @@ ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
 
 
 
+# Define the number of colors you need
+num_colors <- 3
+
+# Choose a ColorBrewer palette
+color_palette <- brewer.pal(num_colors, "Blues")
+
+# Assign colors to each subgroup
+ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.6) +  # Adjust the width and position of the bars
+  labs(x = "Column Depth (cm)", y = "% Increase in Mobility") +
+  scale_fill_manual(values = color_palette) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 16),  # Increase the text size for all elements
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    strip.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    legend.title = element_blank(),
+    legend.position = c(0.15, 0.9),
+    legend.background = element_rect(fill = "white"),
+    panel.grid.minor = element_blank()
+  )
+
+
+
+
+
+
+
+
+
 
 
 
@@ -251,3 +283,4 @@ tk<-TukeyHSD(one.way)
 tk
 summary(one.way)
 #summary(tukey.one.way)
+
