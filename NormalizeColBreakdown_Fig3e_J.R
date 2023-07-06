@@ -33,6 +33,7 @@ actual_values$Depth<- factor(actual_values$Depth,
                                            labels = c("1", "2")
 )
 
+data
 
 #grouping by min_weathered
 actual_values$min_weathered<- factor(actual_values$min_weathered, 
@@ -83,7 +84,7 @@ data <- data.frame(values = c(93.3014,254.322,346.571,73.0361,172.374,349.427), 
                                  "2"),
                                each = 3),
                    subgroup = LETTERS[1:3])
-
+#SUBGROUPS####################################################################################################################################################
 
 
 data_base <- reshape(data,                        # Modify data for Base R barplot
@@ -136,7 +137,42 @@ theme_bw()+
 
 
 
-################################Chat GPT code. WORKS!#############################
+################################Chat GPT code. doesnt work :(  ############################
+
+
+# Define the number of colors you need
+num_colors <- 3
+
+# Choose a ColorBrewer palette
+color_palette <- brewer.pal(num_colors, "Blues")
+
+# Assign colors to each subgroup
+ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.75) +  # Adjust the width and position of the bars
+  labs(x = "Column Depth (cm)", y = "% Increase in Mobility") +
+  scale_fill_manual(values = color_palette) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),  # Increase the text size for all elements
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    strip.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    legend.title = element_blank(),
+    legend.position = c(0.15, 0.9),
+    legend.background = element_rect(fill = "white"),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 25),  # Adjust the size of axis text
+    legend.text = element_text(size = 25),  # Adjust the size of legend text
+    #legend.title = element_text(size = 14)  # Adjust the size of legend title
+  )
+
+
+
+
+
+#DEPTH is supposed to be 1 & 2
+#Subgroup is supposed to be
 
 
 # Define the number of colors you need
@@ -172,21 +208,23 @@ ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
 
 
 
+##########################chatGPS pt2
 
-# Define the number of colors you need
-num_colors <- 3
+# Define the number of colors to match the number of levels in Group
+num_colors <- length(unique(actual_values$Group))
 
 # Choose a ColorBrewer palette
 color_palette <- brewer.pal(num_colors, "Blues")
 
 # Assign colors to each subgroup
-ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.75) +  # Adjust the width and position of the bars
-  labs(x = "Column Depth (cm)", y = "% Increase in Mobility") +
+ggplot(actual_values, aes(x = Depth, y = mob_inc_per, fill = Group)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
+  geom_errorbar(aes(ymin = mob_inc_per - mob_inc_per, ymax = mob_inc_per + mob_inc_per), width = 0.2, position = position_dodge(width = 0.8)) +
+  labs(x = "Depth", y = "% Increase in Mobility") +
   scale_fill_manual(values = color_palette) +
   theme_bw() +
   theme(
-    text = element_text(size = 25),  # Increase the text size for all elements
+    text = element_text(size = 25),
     strip.background = element_blank(),
     strip.placement = "outside",
     strip.text.x = element_blank(),
@@ -195,18 +233,9 @@ ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
     legend.position = c(0.15, 0.9),
     legend.background = element_rect(fill = "white"),
     panel.grid.minor = element_blank(),
-    axis.text = element_text(size = 25),  # Adjust the size of axis text
-    legend.text = element_text(size = 25),  # Adjust the size of legend text
-    #legend.title = element_text(size = 14)  # Adjust the size of legend title
+    axis.text = element_text(size = 25),
+    legend.text = element_text(size = 25)
   )
-
-
-
-
-
-
-
-
 
 
 
@@ -222,6 +251,7 @@ library("ggplot2")                                # Lines 100-126 Vertical three
 data <- data.frame(values = c(93.3014,73.0361,254.322,172.374,346.571,349.427),  # Create example data
                    Min = rep(c("15", "30","60"),each = 2),
                    Depth = LETTERS[1:2])#c(1,2))
+
 data                                              # Print example data
 
 
