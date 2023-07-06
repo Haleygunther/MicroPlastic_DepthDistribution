@@ -208,20 +208,25 @@ ggplot(data, aes(x = Depth, y = values, fill = subgroup)) +
 
 
 
-##########################chatGPS pt2
+##########################chatGPS pt2 doesnt work
 
-# Define the number of colors to match the number of levels in Group
-num_colors <- length(unique(actual_values$Group))
+# Define the number of colors to match the number of subgroups within each depth group
+num_colors <- length(unique(filtered_data$Group)) / length(unique(filtered_data$Depth))
 
-# Choose a ColorBrewer palette
-color_palette <- brewer.pal(num_colors, "Blues")
+# Create a list of unique colors for each subgroup
+color_palette <- rep(brewer.pal(num_colors, "Blues"), length(unique(filtered_data$Depth)))
+
+# Filter data for Depth values of 1 and 2
+filtered_data <- filtered_data %>%
+  filter(Depth %in% c(1, 2))
 
 # Assign colors to each subgroup
-ggplot(actual_values, aes(x = Depth, y = mob_inc_per, fill = Group)) +
+ggplot(filtered_data, aes(x = as.factor(Depth), y = mob_inc_per, fill = Group)) +
   geom_col(position = position_dodge(width = 0.8), width = 0.75) +
   geom_errorbar(aes(ymin = mob_inc_per - mob_inc_per, ymax = mob_inc_per + mob_inc_per), width = 0.2, position = position_dodge(width = 0.8)) +
   labs(x = "Depth", y = "% Increase in Mobility") +
   scale_fill_manual(values = color_palette) +
+  scale_x_discrete(labels = c("1", "2")) +  # Set the x-axis labels as "1" and "2"
   theme_bw() +
   theme(
     text = element_text(size = 25),
@@ -236,6 +241,131 @@ ggplot(actual_values, aes(x = Depth, y = mob_inc_per, fill = Group)) +
     axis.text = element_text(size = 25),
     legend.text = element_text(size = 25)
   )
+
+
+
+
+###################3333333333####take 3- WORKSSSSSS!!!!!!!!!###############
+
+
+
+# Step 1: Load the Required Packages
+install.packages("tidyverse")
+install.packages("googlesheets4")
+library(tidyverse)
+library(googlesheets4)
+
+# Step 2: Read the Dataset from Google Drive
+actual_values <- read_sheet("https://docs.google.com/spreadsheets/d/1DjqdOtdoefnd76telvB_zbPpygFFc2bwYJvmlB4SugE/edit?usp=sharing", sheet = "Depth_comparison")
+
+# Step 3: Rename the Columns
+colnames(actual_values) <- c("Depth", "min_weathered", "OG_Value", "MP_count", "mob_inc_per")
+
+# Step 4: Prepare the Data for Plotting
+actual_values <- actual_values %>%
+  mutate(Group = ifelse(Depth == 1, paste(min_weathered, "min", sep = " "), paste(min_weathered, "min", sep = " ")),
+         Group = factor(Group, levels = c("15 min", "30 min", "60 min")))
+
+# Step 5: Create the Plot
+palette <- brewer.pal(3, "Blues")
+
+ggplot(actual_values, aes(x = factor(Depth), y = mob_inc_per, fill = Group)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
+  geom_errorbar(aes(ymin = mob_inc_per - mob_inc_per, ymax = mob_inc_per + mob_inc_per), width = 0.2, position = position_dodge(width = 0.8)) +
+  labs(x = "Depth", y = "% Increase in Mobility", fill = "Time") +
+  scale_fill_manual(values = palette) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 12),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    strip.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    legend.title = element_blank(),
+    legend.position = c(0.15, 0.9),
+    legend.background = element_rect(fill = "white"),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 25),
+    legend.text = element_text(size = 25)
+  )
+
+
+
+
+
+###################4 (doesnt work)
+
+# Step 1: Load the Required Packages
+install.packages("tidyverse")
+install.packages("googlesheets4")
+library(tidyverse)
+library(googlesheets4)
+
+# Step 2: Read the Dataset from Google Drive
+actual_values <- read_sheet("https://docs.google.com/spreadsheets/d/1DjqdOtdoefnd76telvB_zbPpygFFc2bwYJvmlB4SugE/edit?usp=sharing", sheet = "Depth_comparison")
+
+# Step 3: Rename the Columns
+colnames(actual_values) <- c("Depth", "min_weathered", "OG_Value", "MP_count", "mob_inc_per")
+
+# Step 4: Prepare the Data for Plotting
+actual_values <- actual_values %>%
+  mutate(Group = ifelse(Depth == 1, paste("Depth 1", min_weathered, "min", sep = " "), paste("Depth 2", min_weathered, "min", sep = " "))) %>%
+  mutate(Group = factor(Group, levels = c("Depth 1 15 min", "Depth 1 30 min", "Depth 1 60 min", "Depth 2 15 min", "Depth 2 30 min", "Depth 2 60 min")))
+
+# Step 5: Create the Plot
+palette <- brewer.pal(3, "Blues")
+
+ggplot(actual_values, aes(x = Depth, y = mob_inc_per, fill = Group)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
+  geom_errorbar(aes(ymin = mob_inc_per - mob_inc_per, ymax = mob_inc_per + mob_inc_per), width = 0.2, position = position_dodge(width = 0.8)) +
+  labs(x = "Depth", y = "% Increase in Mobility", fill = "Group") +
+  scale_fill_manual(values = palette) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    strip.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    legend.title = element_blank(),
+    legend.position = c(0.15, 0.9),
+    legend.background = element_rect(fill = "white"),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 25),
+    legend.text = element_text(size = 25)
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
