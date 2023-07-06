@@ -74,54 +74,6 @@ theme(
 
 
 
-###################3333333333####take 3- WORKSSSSSS!!!!!!!!!###############
-
-
-
-# Step 1: Load the Required Packages
-install.packages("tidyverse")
-install.packages("googlesheets4")
-library(tidyverse)
-library(googlesheets4)
-
-# Step 2: Read the Dataset from Google Drive
-actual_values <- read_sheet("https://docs.google.com/spreadsheets/d/1DjqdOtdoefnd76telvB_zbPpygFFc2bwYJvmlB4SugE/edit?usp=sharing", sheet = "Depth_comparison")
-
-# Step 3: Rename the Columns
-colnames(actual_values) <- c("Depth", "min_weathered", "OG_Value", "MP_count", "mob_inc_per")
-
-# Step 4: Prepare the Data for Plotting
-actual_values <- actual_values %>%
-  mutate(Group = ifelse(Depth == 1, paste(min_weathered, "min", sep = " "), paste(min_weathered, "min", sep = " ")),
-         Group = factor(Group, levels = c("15 min", "30 min", "60 min")))
-
-# Step 5: Create the Plot
-palette <- brewer.pal(3, "Blues")
-
-ggplot(actual_values, aes(x = factor(Depth), y = mob_inc_per, fill = Group)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
-  geom_errorbar(aes(ymin = mob_inc_per - mob_inc_per, ymax = mob_inc_per + mob_inc_per), width = 0.2, position = position_dodge(width = 0.8)) +
-  labs(x = "Depth", y = "% Increase in Mobility", fill = "Time") +
-  scale_fill_manual(values = palette) +
-  theme_bw() +
-  theme(
-    text = element_text(size = 12),
-    strip.background = element_blank(),
-    strip.placement = "outside",
-    strip.text.x = element_blank(),
-    panel.grid.major = element_blank(),
-    legend.title = element_blank(),
-    legend.position = c(0.15, 0.9),
-    legend.background = element_rect(fill = "white"),
-    panel.grid.minor = element_blank(),
-    axis.text = element_text(size = 25),
-    legend.text = element_text(size = 25)
-  )
-
-
-
-
-
 
 
 
@@ -169,6 +121,55 @@ ggplot(actual_values, aes(x = reorder(Depth, desc(Depth)), y = mob_inc_per, fill
 
 
 
+
+
+######################take 5
+
+
+# Import data
+actual_values <- read_sheet("https://docs.google.com/spreadsheets/d/1DjqdOtdoefnd76telvB_zbPpygFFc2bwYJvmlB4SugE/edit?usp=sharing", sheet = "Depth_comparison")
+
+# Grouping by Depth value
+actual_values$Depth <- factor(actual_values$Depth, levels = c("2", "1"), labels = c("2", "1"))
+
+# Grouping by min_weathered
+actual_values$min_weathered <- factor(actual_values$min_weathered, levels = c("15", "30", "60"), labels = c("15 min", "30 min", "60 min"))
+
+# Set Color Brewer palette for blue hues
+palette <- brewer.pal(3, "Blues")
+
+ggplot(actual_values, aes(x = reorder(Depth, desc(Depth)), y = mob_inc_per, fill = min_weathered)) +
+  geom_col(position = position_dodge(width = 1.08), width = 1) +
+  geom_errorbar(aes(ymin = mob_inc_per - Norm_STD, ymax = mob_inc_per + Norm_STD),
+                width = 0.3, position = position_dodge(width = 1.08)) +
+  labs(x = "Column Depth (cm)", y = "% Increase in Mobility", fill = "Time") +
+  scale_fill_manual(values = palette, na.translate = FALSE, labels = c("15 min", "30 min", "60 min")) +
+  expand_limits(x = c(0.5, 2), y = c(0, 600)) +
+  annotate("text", x = 0.5, y = 590, label = "(E)", fontface = 2) +
+  update_geom_defaults("text", list(size = 10)) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    axis.text.x = element_text(size = 25),
+    axis.title.x = element_text(size = 25),
+    axis.text.y = element_text(size = 25),
+    axis.title.y = element_text(size = 25),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    strip.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    legend.title = element_blank(),
+    legend.position = c(0.175, 0.92),
+    legend.background = element_rect(fill = "white"),
+    panel.grid.minor = element_blank(),
+    aspect.ratio = 0.7
+  )
+
+
+
+
+
+############### take 6
 
 
 
