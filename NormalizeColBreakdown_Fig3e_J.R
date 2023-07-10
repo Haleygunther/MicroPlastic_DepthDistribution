@@ -23,8 +23,7 @@ library(googledrive)
 library(RColorBrewer)
 
 
-
-##################    Fixing the code that we made for the original graph to work with the second format we want. WORKSSS!!!!!!
+###############Fixing the code that we made for the original graph to work with the second format we want. WORKSSS!!!!!!
 
 # Import data
 actual_values <- read_sheet("https://docs.google.com/spreadsheets/d/1DjqdOtdoefnd76telvB_zbPpygFFc2bwYJvmlB4SugE/edit?usp=sharing", sheet = "Depth_comparison")
@@ -64,5 +63,6 @@ ggplot(actual_values, aes(x = reorder(Depth, desc(Depth)), y = mob_inc_per, fill
     panel.grid.minor = element_blank(),
     aspect.ratio = 0.7
   )
+
 
 
